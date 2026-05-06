@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Production Budget Calculator — Videohunter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0d0d0d;
+    --white: #f9f7f3;
+    --accent: #e8441a;
+    --accent-light: #fdf0ec;
+    --gray-50: #f3f1ec;
+    --gray-100: #e8e5de;
+    --gray-200: #ccc9c1;
+    --gray-400: #9b9890;
+    --gray-600: #5a5852;
+    --gray-800: #2a2925;
+    --green: #1a6640;
+    --green-light: #eaf3ed;
+    --radius: 4px;
+    --radius-lg: 8px;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* TOP NAV */
+  nav {
+    border-bottom: 1px solid var(--gray-100);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+  }
+
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--black);
+    text-decoration: none;
+  }
+
+  .nav-logo span {
+    color: var(--accent);
+  }
+
+  .nav-badge {
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--accent);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 99px;
+    letter-spacing: 0.04em;
+  }
+
+  /* HERO */
+  .hero {
+    border-bottom: 1px solid var(--gray-100);
+    padding: 3.5rem 2rem 3rem;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--black);
+    max-width: 580px;
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    color: var(--gray-600);
+    max-width: 440px;
+    line-height: 1.7;
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  @media (max-width: 680px) {
+    .main { grid-template-columns: 1fr; gap: 2rem; padding: 0 1.25rem 3rem; }
+    .hero { padding: 2.5rem 1.25rem 2rem; }
+    nav { padding: 0 1.25rem; }
+  }
+
+  /* FORM SECTIONS */
+  .form-col { padding-top: 2rem; }
+
+  .form-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 14px;
+  }
+
+  /* PILL TOGGLES */
+  .pill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pill {
+    padding: 8px 16px;
+    border-radius: 99px;
+    border: 1px solid var(--gray-200);
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    color: var(--gray-600);
+    background: transparent;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+
+  .pill:hover {
+    border-color: var(--gray-400);
+    color: var(--black);
+  }
+
+  .pill.active {
+    background: var(--black);
+    border-color: var(--black);
+    color: var(--white);
+  }
+
+  /* SLIDERS */
+  .slider-group { display: flex; flex-direction: column; gap: 14px; }
+
+  .slider-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .slider-label {
+    font-size: 14px;
+    color: var(--gray-600);
+    margin-bottom: 6px;
+  }
+
+  .slider-track { position: relative; }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 2px;
+    background: var(--gray-100);
+    border-radius: 1px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--black);
+    border: 3px solid var(--white);
+    box-shadow: 0 0 0 1px var(--black);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--black); border: 3px solid var(--white);
+    box-shadow: 0 0 0 1px var(--black); cursor: pointer;
+  }
+
+  .slider-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--black);
+    min-width: 24px;
+    text-align: right;
+  }
+
+  /* TOGGLES */
+  .toggle-group { display: flex; flex-direction: column; gap: 0; }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-100);
+    gap: 12px;
+  }
+
+  .toggle-row:last-child { border-bottom: none; }
+
+  .toggle-label { font-size: 14px; color: var(--black); }
+  .toggle-price { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--gray-400); margin-left: auto; }
+
+  .toggle {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  .toggle input { opacity: 0; width: 0; height: 0; }
+
+  .toggle-slider {
+    position: absolute; inset: 0;
+    background: var(--gray-100);
+    border-radius: 11px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .toggle input:checked + .toggle-slider { background: var(--black); }
+
+  .toggle-slider:before {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    top: 3px; left: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+
+  .toggle input:checked + .toggle-slider:before { transform: translateX(18px); }
+
+  /* RESULT COLUMN */
+  .result-col {
+    padding-top: 2rem;
+    position: sticky;
+    top: 1.5rem;
+  }
+
+  .result-card {
+    background: var(--black);
+    color: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .result-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 1rem;
+  }
+
+  .result-amount {
+    font-size: 42px;
+    font-weight: 300;
+    line-height: 1;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+
+  .result-range {
+    font-size: 13px;
+    color: var(--gray-400);
+    margin-bottom: 1.75rem;
+  }
+
+  .breakdown {
+    border-top: 1px solid #2a2925;
+    padding-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .breakdown-label { font-size: 13px; color: var(--gray-400); }
+  .breakdown-val { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--white); }
+
+  .breakdown-bar-wrap {
+    height: 2px;
+    background: #2a2925;
+    border-radius: 1px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+
+  .breakdown-bar {
+    height: 2px;
+    background: var(--accent);
+    border-radius: 1px;
+    transition: width 0.4s ease;
+  }
+
+  /* CTA CARD */
+  .cta-card {
+    border: 1px solid var(--gray-100);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    background: var(--white);
+  }
+
+  .cta-card p {
+    font-size: 13px;
+    color: var(--gray-600);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .cta-card a {
+    display: block;
+    width: 100%;
+    padding: 12px 20px;
+    background: var(--accent);
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: var(--radius);
+    transition: opacity 0.15s;
+  }
+
+  .cta-card a:hover { opacity: 0.88; }
+
+  .cta-studio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--gray-100);
+  }
+
+  .studio-dot {
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  .studio-text { font-size: 12px; color: var(--gray-400); }
+  .studio-text a { color: var(--black); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--gray-100);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 860px;
+    margin: 0 auto;
+    font-size: 12px;
+    color: var(--gray-400);
+  }
+
+  footer a { color: var(--gray-600); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--gray-100); margin-bottom: 2.5rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">Video<span>hunter</span></a>
+  <span class="nav-badge">Free tool</span>
+</nav>
+
+<div class="hero">
+  <p class="hero-eyebrow">Budget calculator · 2026 edition</p>
+  <h1>How much should your <em>video project</em> cost?</h1>
+  <p class="hero-desc">Adjust the parameters below to get an instant budget estimate — broken down by pre-production, shoot, and post. No signup, no catch.</p>
+</div>
+
+<div class="main">
+
+  <!-- LEFT: FORM -->
+  <div class="form-col">
+
+    <div class="form-section">
+      <div class="section-label">01 — Video type</div>
+      <div class="pill-grid" id="type-pills">
+        <div class="pill active" data-type="brand" onclick="setPill(this,'type')">Brand film</div>
+        <div class="pill" data-type="social" onclick="setPill(this,'type')">Social content</div>
+        <div class="pill" data-type="product" onclick="setPill(this,'type')">Product video</div>
+        <div class="pill" data-type="interview" onclick="setPill(this,'type')">Interview / talking head</div>
+        <div class="pill" data-type="event" onclick="setPill(this,'type')">Event coverage</div>
+        <div class="pill" data-type="explainer" onclick="setPill(this,'type')">Explainer / promo</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="form-section">
+      <div class="section-label">02 — Scope</div>
+      <div class="slider-group">
+        <div>
+          <div class="slider-label">Final length (minutes)</div>
+          <div class="slider-row">
+            <input type="range" min="1" max="10" step="1" value="2" id="sl-duration" oninput="calc()">
+            <span class="slider-val" id="out-duration">2</span>
+          </div>
+        </div>
+        <div>
+          <div class="slider-label">Number of videos</div>
+          <div class="slider-row">
+            <input type="range" min="1" max="10" step="1" value="1" id="sl-qty" oninput="calc()">
+            <span class="slider-val" id="out-qty">1</span>
+          </div>
+        </div>
+        <div>
+          <div class="slider-label">Shoot days</div>
+          <div class="slider-row">
+            <input type="range" min="1" max="5" step="1" value="1" id="sl-days" oninput="calc()">
+            <span class="slider-val" id="out-days">1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="form-section">
+      <div class="section-label">03 — Production quality</div>
+      <div class="pill-grid" id="qual-pills">
+        <div class="pill active" data-qual="standard" onclick="setPill(this,'qual')">Standard</div>
+        <div class="pill" data-qual="premium" onclick="setPill(this,'qual')">Premium</div>
+        <div class="pill" data-qual="cinematic" onclick="setPill(this,'qual')">Cinematic</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="form-section">
+      <div class="section-label">04 — Add-ons</div>
+      <div class="toggle-group">
+        <div class="toggle-row">
+          <span class="toggle-label">Professional voiceover</span>
+          <span class="toggle-price">+$350</span>
+          <label class="toggle"><input type="checkbox" id="tog-vo" onchange="calc()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Motion graphics / animation</span>
+          <span class="toggle-price">+$600</span>
+          <label class="toggle"><input type="checkbox" id="tog-mograph" onchange="calc()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Licensed music</span>
+          <span class="toggle-price">+$150</span>
+          <label class="toggle"><input type="checkbox" id="tog-music" onchange="calc()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Subtitles & captions</span>
+          <span class="toggle-price">+$120</span>
+          <label class="toggle"><input type="checkbox" id="tog-subs" onchange="calc()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label">Additional formats (vertical, square)</span>
+          <span class="toggle-price">+$250</span>
+          <label class="toggle"><input type="checkbox" id="tog-formats" onchange="calc()"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: RESULT -->
+  <div class="result-col">
+
+    <div class="result-card">
+      <div class="result-eyebrow">Estimated budget</div>
+      <div class="result-amount" id="res-total">$2,400</div>
+      <div class="result-range" id="res-range">Range: $1,900 – $2,900</div>
+
+      <div class="breakdown">
+        <div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Pre-production</span>
+            <span class="breakdown-val" id="rb-pre">$480</span>
+          </div>
+          <div class="breakdown-bar-wrap"><div class="breakdown-bar" id="bar-pre" style="width:20%"></div></div>
+        </div>
+        <div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Production (shoot)</span>
+            <span class="breakdown-val" id="rb-shoot">$960</span>
+          </div>
+          <div class="breakdown-bar-wrap"><div class="breakdown-bar" id="bar-shoot" style="width:40%"></div></div>
+        </div>
+        <div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Post-production</span>
+            <span class="breakdown-val" id="rb-post">$720</span>
+          </div>
+          <div class="breakdown-bar-wrap"><div class="breakdown-bar" id="bar-post" style="width:30%"></div></div>
+        </div>
+        <div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Add-ons</span>
+            <span class="breakdown-val" id="rb-addons">$240</span>
+          </div>
+          <div class="breakdown-bar-wrap"><div class="breakdown-bar" id="bar-addons" style="width:10%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-card">
+      <p>These are market estimates. Want an exact quote tailored to your project?</p>
+      <a href="https://videohunter.pro" target="_blank">Request a quote from Videohunter →</a>
+      <div class="cta-studio">
+        <div class="studio-dot"></div>
+        <span class="studio-text">Made by <a href="https://videohunter.pro" target="_blank">Videohunter</a> — video production studio</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <span>© 2026 Videohunter. Free to use and share.</span>
+  <a href="https://videohunter.pro" target="_blank">videohunter.pro</a>
+</footer>
+
+<script>
+  const baseRates = {
+    brand:     { pre: 0.22, shoot: 0.45, post: 0.33, day: 1400 },
+    social:    { pre: 0.15, shoot: 0.40, post: 0.30, day: 700  },
+    product:   { pre: 0.18, shoot: 0.42, post: 0.30, day: 950  },
+    interview: { pre: 0.12, shoot: 0.38, post: 0.28, day: 800  },
+    event:     { pre: 0.10, shoot: 0.50, post: 0.25, day: 900  },
+    explainer: { pre: 0.20, shoot: 0.35, post: 0.35, day: 1100 },
+  };
+  const qualMult = { standard: 1, premium: 1.65, cinematic: 2.4 };
+  const addonCosts = { vo: 350, mograph: 600, music: 150, subs: 120, formats: 250 };
+
+  let activeType = 'brand';
+  let activeQual = 'standard';
+
+  function setPill(el, group) {
+    const container = group === 'type' ? '#type-pills' : '#qual-pills';
+    document.querySelectorAll(container + ' .pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    if (group === 'type') activeType = el.dataset.type;
+    else activeQual = el.dataset.qual;
+    calc();
+  }
+
+  function fmt(n) {
+    return '$' + n.toLocaleString('en-US');
+  }
+
+  function calc() {
+    const duration = +document.getElementById('sl-duration').value;
+    const qty      = +document.getElementById('sl-qty').value;
+    const days     = +document.getElementById('sl-days').value;
+
+    document.getElementById('out-duration').textContent = duration;
+    document.getElementById('out-qty').textContent = qty;
+    document.getElementById('out-days').textContent = days;
+
+    const r  = baseRates[activeType];
+    const qm = qualMult[activeQual];
+    const base = r.day * days * qm * (1 + (duration - 1) * 0.12) * qty;
+
+    let addons = 0;
+    if (document.getElementById('tog-vo').checked)      addons += addonCosts.vo;
+    if (document.getElementById('tog-mograph').checked) addons += addonCosts.mograph;
+    if (document.getElementById('tog-music').checked)   addons += addonCosts.music;
+    if (document.getElementById('tog-subs').checked)    addons += addonCosts.subs;
+    if (document.getElementById('tog-formats').checked) addons += addonCosts.formats;
+
+    const total = Math.round((base + addons) / 100) * 100;
+    const lo    = Math.round(total * 0.82 / 100) * 100;
+    const hi    = Math.round(total * 1.22 / 100) * 100;
+
+    const pre   = Math.round(base * r.pre   / 100) * 100;
+    const shoot = Math.round(base * r.shoot / 100) * 100;
+    const post  = Math.round(base * r.post  / 100) * 100;
+    const addonR = Math.round(addons / 10) * 10;
+
+    document.getElementById('res-total').textContent  = fmt(total);
+    document.getElementById('res-range').textContent  = 'Range: ' + fmt(lo) + ' – ' + fmt(hi);
+    document.getElementById('rb-pre').textContent     = fmt(pre);
+    document.getElementById('rb-shoot').textContent   = fmt(shoot);
+    document.getElementById('rb-post').textContent    = fmt(post);
+    document.getElementById('rb-addons').textContent  = fmt(addonR);
+
+    const totalForBars = pre + shoot + post + addonR || 1;
+    document.getElementById('bar-pre').style.width    = Math.round(pre   / totalForBars * 100) + '%';
+    document.getElementById('bar-shoot').style.width  = Math.round(shoot / totalForBars * 100) + '%';
+    document.getElementById('bar-post').style.width   = Math.round(post  / totalForBars * 100) + '%';
+    document.getElementById('bar-addons').style.width = Math.round(addonR/ totalForBars * 100) + '%';
+  }
+
+  calc();
+</script>
+
+</body>
+</html>
